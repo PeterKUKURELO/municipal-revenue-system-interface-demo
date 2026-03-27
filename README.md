@@ -8,4 +8,16 @@
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
+
+  ## Demo access data
+
+  The login data for this demo is controlled from `db.json`.
+
+  Citizen demo:
+  `DNI: 45871236`
+  `Ubigeo: 150114`
+
+  Admin demo:
+  `Usuario: admin`
+  `Contraseña: admin123`
   

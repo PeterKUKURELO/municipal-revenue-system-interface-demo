@@ -1,0 +1,301 @@
+{
+  "settings": {
+    "paymentChannels": ["BCP", "BBVA", "Scotiabank", "Interbank", "Yape"],
+    "citizenAccessHint": {
+      "dni": "45871236",
+      "ubigeo": "150114"
+    }
+  },
+  "admins": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "displayName": "Administrador Municipal"
+    }
+  ],
+  "citizens": [
+    {
+      "dni": "45871236",
+      "ubigeo": "150114",
+      "name": "María Torres Silva",
+      "debtSummary": {
+        "total": 2450,
+        "arbitrios": 850,
+        "multas": 1200,
+        "otros": 400
+      },
+      "recentPayments": [
+        {
+          "date": "15/03/2026",
+          "concept": "Arbitrios - Enero 2026",
+          "amount": 280.5,
+          "status": "Completado"
+        },
+        {
+          "date": "10/02/2026",
+          "concept": "Impuesto Predial 2026",
+          "amount": 520,
+          "status": "Completado"
+        },
+        {
+          "date": "05/01/2026",
+          "concept": "Multa de Tránsito",
+          "amount": 180,
+          "status": "Completado"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "1",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Marzo",
+          "description": "Limpieza pública, parques y jardines",
+          "amount": 285,
+          "status": "Pendiente"
+        },
+        {
+          "id": "2",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Febrero",
+          "description": "Limpieza pública, parques y jardines",
+          "amount": 285,
+          "status": "Vencido"
+        },
+        {
+          "id": "3",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Enero",
+          "description": "Limpieza pública, parques y jardines",
+          "amount": 280,
+          "status": "Vencido"
+        },
+        {
+          "id": "4",
+          "type": "Multas",
+          "year": "2026",
+          "period": "-",
+          "description": "Infracción por estacionamiento indebido",
+          "amount": 450,
+          "status": "Pendiente"
+        },
+        {
+          "id": "5",
+          "type": "Multas",
+          "year": "2025",
+          "period": "-",
+          "description": "Infracción de tránsito - Semáforo en rojo",
+          "amount": 750,
+          "status": "Vencido"
+        },
+        {
+          "id": "6",
+          "type": "Impuesto Predial",
+          "year": "2026",
+          "period": "Anual",
+          "description": "Impuesto predial 2026",
+          "amount": 1200,
+          "status": "Pendiente"
+        },
+        {
+          "id": "7",
+          "type": "Otros",
+          "year": "2026",
+          "period": "-",
+          "description": "Licencia de funcionamiento",
+          "amount": 400,
+          "status": "Pendiente"
+        }
+      ]
+    },
+    {
+      "dni": "73124589",
+      "ubigeo": "150122",
+      "name": "Carlos Ramos López",
+      "debtSummary": {
+        "total": 1835,
+        "arbitrios": 560,
+        "multas": 875,
+        "otros": 400
+      },
+      "recentPayments": [
+        {
+          "date": "20/03/2026",
+          "concept": "Arbitrios - Febrero 2026",
+          "amount": 280,
+          "status": "Completado"
+        },
+        {
+          "date": "09/02/2026",
+          "concept": "Papeleta administrativa",
+          "amount": 250,
+          "status": "Completado"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "8",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Marzo",
+          "description": "Limpieza pública y serenazgo",
+          "amount": 280,
+          "status": "Pendiente"
+        },
+        {
+          "id": "9",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Febrero",
+          "description": "Limpieza pública y serenazgo",
+          "amount": 280,
+          "status": "Pendiente"
+        },
+        {
+          "id": "10",
+          "type": "Multas",
+          "year": "2026",
+          "period": "-",
+          "description": "Infracción por ruidos molestos",
+          "amount": 875,
+          "status": "Pendiente"
+        },
+        {
+          "id": "11",
+          "type": "Otros",
+          "year": "2026",
+          "period": "-",
+          "description": "Derecho de trámite municipal",
+          "amount": 400,
+          "status": "Pendiente"
+        }
+      ]
+    },
+    {
+      "dni": "51247863",
+      "ubigeo": "150123",
+      "name": "Ana Martínez Ruiz",
+      "debtSummary": {
+        "total": 920,
+        "arbitrios": 520,
+        "multas": 0,
+        "otros": 400
+      },
+      "recentPayments": [
+        {
+          "date": "14/03/2026",
+          "concept": "Impuesto Predial - Cuota 1",
+          "amount": 450,
+          "status": "Completado"
+        }
+      ],
+      "obligations": [
+        {
+          "id": "12",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Marzo",
+          "description": "Limpieza pública y parques",
+          "amount": 260,
+          "status": "Pendiente"
+        },
+        {
+          "id": "13",
+          "type": "Arbitrios",
+          "year": "2026",
+          "period": "Febrero",
+          "description": "Limpieza pública y parques",
+          "amount": 260,
+          "status": "Pendiente"
+        },
+        {
+          "id": "14",
+          "type": "Otros",
+          "year": "2026",
+          "period": "-",
+          "description": "Constancia administrativa",
+          "amount": 400,
+          "status": "Pendiente"
+        }
+      ]
+    }
+  ],
+  "adminDashboard": {
+    "metrics": {
+      "totalRecaudado": 45280.5,
+      "transaccionesHoy": 127,
+      "contribuyentes": 3456,
+      "tasaConversion": 78.5
+    },
+    "recentTransactions": [
+      {
+        "id": "1",
+        "contribuyente": "Juan Pérez García",
+        "tipo": "Arbitrios",
+        "monto": 285,
+        "fecha": "27/03/2026 10:45",
+        "estado": "Completado"
+      },
+      {
+        "id": "2",
+        "contribuyente": "María Torres Silva",
+        "tipo": "Multa",
+        "monto": 450,
+        "fecha": "27/03/2026 10:30",
+        "estado": "Completado"
+      },
+      {
+        "id": "3",
+        "contribuyente": "Carlos Ramos López",
+        "tipo": "Impuesto Predial",
+        "monto": 1200,
+        "fecha": "27/03/2026 10:15",
+        "estado": "Completado"
+      },
+      {
+        "id": "4",
+        "contribuyente": "Ana Martínez Ruiz",
+        "tipo": "Arbitrios",
+        "monto": 285,
+        "fecha": "27/03/2026 10:00",
+        "estado": "Completado"
+      },
+      {
+        "id": "5",
+        "contribuyente": "Roberto Sánchez Cruz",
+        "tipo": "Otros",
+        "monto": 400,
+        "fecha": "27/03/2026 09:45",
+        "estado": "Completado"
+      }
+    ],
+    "paymentsByType": [
+      {
+        "type": "Arbitrios",
+        "count": 45,
+        "total": 12825,
+        "percentage": 35
+      },
+      {
+        "type": "Multas",
+        "count": 32,
+        "total": 18400,
+        "percentage": 28
+      },
+      {
+        "type": "Impuesto Predial",
+        "count": 28,
+        "total": 11200,
+        "percentage": 22
+      },
+      {
+        "type": "Otros",
+        "count": 22,
+        "total": 2855.5,
+        "percentage": 15
+      }
+    ]
+  }
+}

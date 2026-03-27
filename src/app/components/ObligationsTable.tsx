@@ -1,44 +1,32 @@
 import { useState } from 'react';
 import { Home, AlertCircle, FileText, Building2, Filter } from 'lucide-react';
-
-interface Obligation {
-  id: string;
-  type: 'Arbitrios' | 'Multas' | 'Impuesto Predial' | 'Otros';
-  year: string;
-  period: string;
-  description: string;
-  amount: number;
-  status: 'Pagado' | 'Pendiente' | 'Vencido';
-}
+import type { Obligation, ObligationType } from '../types';
 
 interface ObligationsTableProps {
+  obligations: Obligation[];
   onPaySelected: (selected: Obligation[]) => void;
 }
 
-const mockObligations: Obligation[] = [
-  { id: '1', type: 'Arbitrios', year: '2026', period: 'Marzo', description: 'Limpieza pública, parques y jardines', amount: 285.00, status: 'Pendiente' },
-  { id: '2', type: 'Arbitrios', year: '2026', period: 'Febrero', description: 'Limpieza pública, parques y jardines', amount: 285.00, status: 'Vencido' },
-  { id: '3', type: 'Arbitrios', year: '2026', period: 'Enero', description: 'Limpieza pública, parques y jardines', amount: 280.00, status: 'Vencido' },
-  { id: '4', type: 'Multas', year: '2026', period: '-', description: 'Infracción por estacionamiento indebido', amount: 450.00, status: 'Pendiente' },
-  { id: '5', type: 'Multas', year: '2025', period: '-', description: 'Infracción de tránsito - Semáforo en rojo', amount: 750.00, status: 'Vencido' },
-  { id: '6', type: 'Impuesto Predial', year: '2026', period: 'Anual', description: 'Impuesto predial 2026', amount: 1200.00, status: 'Pendiente' },
-  { id: '7', type: 'Otros', year: '2026', period: '-', description: 'Licencia de funcionamiento', amount: 400.00, status: 'Pendiente' }
-];
-
-const typeConfig = {
+const typeConfig: Record<
+  ObligationType,
+  { icon: typeof Home; color: string; bgColor: string }
+> = {
   'Arbitrios': { icon: Home, color: 'text-[#0FA958]', bgColor: 'bg-[#E8F5E9]' },
   'Multas': { icon: AlertCircle, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   'Impuesto Predial': { icon: Building2, color: 'text-blue-600', bgColor: 'bg-blue-50' },
   'Otros': { icon: FileText, color: 'text-purple-600', bgColor: 'bg-purple-50' }
 };
 
-export default function ObligationsTable({ onPaySelected }: ObligationsTableProps) {
+export default function ObligationsTable({
+  obligations,
+  onPaySelected
+}: ObligationsTableProps) {
   const [selected, setSelected] = useState<string[]>([]);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<ObligationType | 'all'>('all');
 
   const filteredObligations = filter === 'all'
-    ? mockObligations
-    : mockObligations.filter(o => o.type === filter);
+    ? obligations
+    : obligations.filter(o => o.type === filter);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -57,11 +45,11 @@ export default function ObligationsTable({ onPaySelected }: ObligationsTableProp
   };
 
   const handlePaySelected = () => {
-    const selectedObligations = mockObligations.filter(o => selected.includes(o.id));
+    const selectedObligations = obligations.filter(o => selected.includes(o.id));
     onPaySelected(selectedObligations);
   };
 
-  const totalSelected = mockObligations
+  const totalSelected = obligations
     .filter(o => selected.includes(o.id))
     .reduce((sum, o) => sum + o.amount, 0);
 

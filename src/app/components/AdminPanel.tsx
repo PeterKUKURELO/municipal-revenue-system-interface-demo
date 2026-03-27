@@ -1,33 +1,30 @@
 import { Users, TrendingUp, Calendar, DollarSign } from 'lucide-react';
+import type {
+  AdminMetrics,
+  AdminTransaction,
+  PaymentTypeSummary
+} from '../types';
 
-export default function AdminPanel() {
-  const metrics = {
-    totalRecaudado: 45280.50,
-    transaccionesHoy: 127,
-    contribuyentes: 3456,
-    tasaConversion: 78.5
-  };
+interface AdminPanelProps {
+  adminName: string;
+  metrics: AdminMetrics;
+  recentTransactions: AdminTransaction[];
+  paymentsByType: PaymentTypeSummary[];
+}
 
-  const recentTransactions = [
-    { id: '1', contribuyente: 'Juan Pérez García', tipo: 'Arbitrios', monto: 285.00, fecha: '27/03/2026 10:45', estado: 'Completado' },
-    { id: '2', contribuyente: 'María Torres Silva', tipo: 'Multa', monto: 450.00, fecha: '27/03/2026 10:30', estado: 'Completado' },
-    { id: '3', contribuyente: 'Carlos Ramos López', tipo: 'Impuesto Predial', monto: 1200.00, fecha: '27/03/2026 10:15', estado: 'Completado' },
-    { id: '4', contribuyente: 'Ana Martínez Ruiz', tipo: 'Arbitrios', monto: 285.00, fecha: '27/03/2026 10:00', estado: 'Completado' },
-    { id: '5', contribuyente: 'Roberto Sánchez Cruz', tipo: 'Otros', monto: 400.00, fecha: '27/03/2026 09:45', estado: 'Completado' }
-  ];
-
-  const paymentsByType = [
-    { type: 'Arbitrios', count: 45, total: 12825.00, percentage: 35 },
-    { type: 'Multas', count: 32, total: 18400.00, percentage: 28 },
-    { type: 'Impuesto Predial', count: 28, total: 11200.00, percentage: 22 },
-    { type: 'Otros', count: 22, total: 2855.50, percentage: 15 }
-  ];
-
+export default function AdminPanel({
+  adminName,
+  metrics,
+  recentTransactions,
+  paymentsByType
+}: AdminPanelProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h2 className="text-2xl text-gray-900">Panel Administrativo</h2>
-        <p className="text-gray-600 mt-1">Vista general de recaudación y transacciones</p>
+        <p className="text-gray-600 mt-1">
+          Vista general de recaudación y transacciones para {adminName}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

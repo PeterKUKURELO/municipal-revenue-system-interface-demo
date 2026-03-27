@@ -1,29 +1,38 @@
-import { CreditCard, AlertCircle, FileText, Home } from 'lucide-react';
+import { CreditCard, AlertCircle, FileText, Home, IdCard, MapPinned } from 'lucide-react';
+import type { DebtSummary, RecentPayment } from '../types';
 
 interface DashboardProps {
   userName: string;
+  dni: string;
+  ubigeo: string;
+  debtSummary: DebtSummary;
+  recentPayments: RecentPayment[];
   onPayNow: () => void;
 }
 
-export default function Dashboard({ userName, onPayNow }: DashboardProps) {
-  const debtSummary = {
-    total: 2450.00,
-    arbitrios: 850.00,
-    multas: 1200.00,
-    otros: 400.00
-  };
-
-  const recentPayments = [
-    { date: '15/03/2026', concept: 'Arbitrios - Enero 2026', amount: 280.50, status: 'Completado' },
-    { date: '10/02/2026', concept: 'Impuesto Predial 2026', amount: 520.00, status: 'Completado' },
-    { date: '05/01/2026', concept: 'Multa de Tránsito', amount: 180.00, status: 'Completado' }
-  ];
-
+export default function Dashboard({
+  userName,
+  dni,
+  ubigeo,
+  debtSummary,
+  recentPayments,
+  onPayNow
+}: DashboardProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h2 className="text-2xl text-gray-900">Hola, {userName}</h2>
         <p className="text-gray-600 mt-1">Bienvenido a tu panel de gestión tributaria</p>
+        <div className="flex flex-wrap gap-3 mt-4">
+          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-[#E8F5E9] text-sm text-[#0B7A43]">
+            <IdCard className="w-4 h-4" />
+            DNI {dni}
+          </div>
+          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-blue-50 text-sm text-blue-700">
+            <MapPinned className="w-4 h-4" />
+            Ubigeo {ubigeo}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
