@@ -3,7 +3,7 @@
     "paymentChannels": ["BCP", "BBVA", "Scotiabank", "Interbank", "Yape"],
     "citizenAccessHint": {
       "dni": "45871236",
-      "ubigeo": "150114"
+      "cartillaPassword": "CART-4587"
     }
   },
   "admins": [
@@ -17,6 +17,7 @@
     {
       "dni": "45871236",
       "ubigeo": "150114",
+      "cartillaPassword": "CART-4587",
       "name": "María Torres Silva",
       "debtSummary": {
         "total": 2450,
@@ -113,6 +114,7 @@
     {
       "dni": "73124589",
       "ubigeo": "150122",
+      "cartillaPassword": "CART-7312",
       "name": "Carlos Ramos López",
       "debtSummary": {
         "total": 1835,
@@ -176,6 +178,7 @@
     {
       "dni": "51247863",
       "ubigeo": "150123",
+      "cartillaPassword": "CART-5124",
       "name": "Ana Martínez Ruiz",
       "debtSummary": {
         "total": 920,

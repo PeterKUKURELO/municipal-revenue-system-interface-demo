@@ -1,9 +1,9 @@
 import { FormEvent, useState } from 'react';
 import {
   ArrowRight,
+  CircleHelp,
   IdCard,
   LockKeyhole,
-  MapPinned,
   ShieldCheck
 } from 'lucide-react';
 import type { AdminRecord } from '../types';
@@ -13,6 +13,7 @@ import dinnersLogo from '../../assets/dinners.png';
 import mstcLogo from '../../assets/mstc.png';
 import pagoEfectivoLogo from '../../assets/pagoefectivo.png';
 import payMeLogo from '../../assets/Pay-Me_logo.png';
+import cartillaMunicipalImage from '../../assets/cartillaMunicipal.png';
 import qrLogo from '../../assets/qr.png';
 import visaLogo from '../../assets/visa.png';
 import yapeLogo from '../../assets/yape.png';
@@ -21,7 +22,10 @@ type AccessMode = 'citizen' | 'admin';
 
 interface AccessPortalProps {
   adminAccessHint: AdminRecord;
-  onCitizenLogin: (credentials: { dni: string; ubigeo: string }) => string | null;
+  onCitizenLogin: (credentials: {
+    dni: string;
+    cartillaPassword: string;
+  }) => string | null;
   onAdminLogin: (credentials: {
     username: string;
     password: string;
@@ -48,10 +52,11 @@ export default function AccessPortal({
 
   const [mode, setMode] = useState<AccessMode>('citizen');
   const [dni, setDni] = useState('');
-  const [ubigeo, setUbigeo] = useState('');
+  const [cartillaPassword, setCartillaPassword] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showCartillaHelp, setShowCartillaHelp] = useState(false);
 
   const handleCitizenSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,12 +66,15 @@ export default function AccessPortal({
       return;
     }
 
-    if (!/^\d{6}$/.test(ubigeo)) {
-      setError('Ingresa un ubigeo válido de 6 dígitos.');
+    if (cartillaPassword.trim().length < 6) {
+      setError('Ingresa la contraseña de la cartilla municipal.');
       return;
     }
 
-    const loginError = onCitizenLogin({ dni, ubigeo });
+    const loginError = onCitizenLogin({
+      dni,
+      cartillaPassword: cartillaPassword.trim()
+    });
     setError(loginError ?? '');
   };
 
@@ -83,6 +91,7 @@ export default function AccessPortal({
   const switchMode = (nextMode: AccessMode) => {
     setMode(nextMode);
     setError('');
+    setShowCartillaHelp(false);
   };
 
   return (
@@ -118,7 +127,7 @@ export default function AccessPortal({
                 <h2 className="mb-2 text-lg text-slate-900">Acceso ciudadano</h2>
                 <p className="m-0 text-sm leading-6 text-slate-600">
                   Consulta deudas, historial de pagos y conceptos pendientes
-                  usando DNI y ubigeo.
+                  usando tu DNI y la clave de la cartilla municipal.
                 </p>
               </div>
 
@@ -217,11 +226,11 @@ export default function AccessPortal({
                     Inicio de sesión
                   </p>
                   <h2 className="mb-2 text-3xl text-slate-900">
-                    Ingresa con tu DNI y ubigeo
+                    Ingresa con tu DNI y tu clave municipal
                   </h2>
                   <p className="m-0 text-sm leading-6 text-slate-600">
-                    Inspirado en un acceso municipal clásico, pero adaptado para
-                    identificar al contribuyente por documento y código de ubigeo.
+                    Accede con tu documento y la contraseña que recibiste en tu
+                    cartilla municipal para revisar deuda y pagos.
                   </p>
                 </div>
 
@@ -244,18 +253,43 @@ export default function AccessPortal({
 
                   <label className="block">
                     <span className="mb-2 flex items-center gap-2 text-sm text-slate-700">
-                      <MapPinned className="h-4 w-4 text-[#0FA958]" />
-                      Código de ubigeo
+                      <LockKeyhole className="h-4 w-4 text-[#0FA958]" />
+                      Contraseña de cartilla municipal
                     </span>
                     <input
-                      value={ubigeo}
-                      onChange={(event) =>
-                        setUbigeo(event.target.value.replace(/\D/g, '').slice(0, 6))
-                      }
-                      inputMode="numeric"
-                      placeholder="150114"
+                      type="password"
+                      value={cartillaPassword}
+                      onChange={(event) => setCartillaPassword(event.target.value)}
+                      placeholder="Ingresa tu contraseña"
                       className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-[#0FA958] focus:bg-white"
                     />
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2 text-xs leading-5 text-slate-500">
+                        <span>
+                          La encontrarás en la cartilla municipal entregada al
+                          contribuyente.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowCartillaHelp((current) => !current)}
+                          className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#0FA958]/25 bg-white text-[#0FA958] transition hover:border-[#0FA958] hover:bg-[#F5FAF7]"
+                          aria-label="Ver referencia de la cartilla municipal"
+                          aria-expanded={showCartillaHelp}
+                        >
+                          <CircleHelp className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
+                      {showCartillaHelp && (
+                        <div className="mt-3 overflow-hidden rounded-2xl border border-[#0FA958]/15 bg-[#F5FAF7] p-3">
+                          <img
+                            src={cartillaMunicipalImage}
+                            alt="Referencia visual de la cartilla municipal con la ubicación de la contraseña"
+                            className="w-full rounded-xl object-contain"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </label>
 
                   {error && (

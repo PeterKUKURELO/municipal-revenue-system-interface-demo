@@ -250,17 +250,19 @@ export default function App() {
 
   const handleCitizenLogin = ({
     dni,
-    ubigeo
+    cartillaPassword
   }: {
     dni: string;
-    ubigeo: string;
+    cartillaPassword: string;
   }) => {
     const citizen = appData.citizens.find(
-      (item) => item.dni === dni && item.ubigeo === ubigeo
+      (item) =>
+        item.dni === dni &&
+        item.cartillaPassword === cartillaPassword.trim()
     );
 
     if (!citizen) {
-      return 'No encontramos un contribuyente con ese DNI y ubigeo.';
+      return 'No encontramos un contribuyente con ese DNI y contraseña de cartilla.';
     }
 
     setSession({

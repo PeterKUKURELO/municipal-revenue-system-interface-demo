@@ -4,7 +4,7 @@ Demo web de recaudacion municipal con acceso separado para contribuyente y admin
 
 ## Que incluye
 
-- Login ciudadano con `DNI + ubigeo`
+- Login ciudadano con `DNI + contraseña de cartilla municipal`
 - Login administrativo independiente
 - Dashboard ciudadano con deuda, obligaciones e historial
 - Panel admin con metricas y transacciones recientes
@@ -54,7 +54,7 @@ Los accesos se controlan desde `db.json`.
 ### Contribuyente
 
 - DNI: `45871236`
-- Ubigeo: `150114`
+- Contraseña de cartilla: `CART-4587`
 
 ### Administracion
 
@@ -106,6 +106,8 @@ La integracion actual esta pensada solo para demo visual y pruebas de flujo.
 ### Cambiar usuarios o obligaciones
 
 Edita [db.json](./db.json) y luego limpia el `localStorage` si quieres que esos cambios se reflejen desde cero.
+
+Si cambias el esquema de acceso, por ejemplo de `ubigeo` a `contraseña de cartilla`, conviene reiniciar el demo para evitar que el navegador siga usando datos antiguos.
 
 ### Cambiar branding o logos
 

@@ -7,6 +7,33 @@ function cloneSeedData(): AppData {
   return JSON.parse(JSON.stringify(seedDatabase)) as AppData;
 }
 
+function normalizeAppData(data: AppData): AppData {
+  const seedData = cloneSeedData();
+
+  return {
+    ...seedData,
+    ...data,
+    settings: {
+      ...seedData.settings,
+      ...data.settings,
+      citizenAccessHint: {
+        ...seedData.settings.citizenAccessHint,
+        ...data.settings?.citizenAccessHint
+      }
+    },
+    citizens: data.citizens.map((citizen) => {
+      const seedCitizen = seedData.citizens.find((item) => item.dni === citizen.dni);
+
+      return {
+        ...seedCitizen,
+        ...citizen,
+        cartillaPassword:
+          citizen.cartillaPassword ?? seedCitizen?.cartillaPassword ?? ''
+      };
+    })
+  };
+}
+
 export function loadAppData(): AppData {
   if (typeof window === 'undefined') {
     return cloneSeedData();
@@ -18,7 +45,7 @@ export function loadAppData(): AppData {
   }
 
   try {
-    return JSON.parse(raw) as AppData;
+    return normalizeAppData(JSON.parse(raw) as AppData);
   } catch {
     return cloneSeedData();
   }

@@ -29,6 +29,7 @@ export interface RecentPayment {
 export interface CitizenRecord {
   dni: string;
   ubigeo: string;
+  cartillaPassword: string;
   name: string;
   debtSummary: DebtSummary;
   recentPayments: RecentPayment[];
@@ -72,7 +73,7 @@ export interface AdminDashboardData {
 
 export interface AccessHint {
   dni: string;
-  ubigeo: string;
+  cartillaPassword: string;
 }
 
 export interface AppData {
