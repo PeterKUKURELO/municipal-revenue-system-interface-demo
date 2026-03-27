@@ -116,7 +116,7 @@ Los assets estan en `src/assets`.
 Este proyecto ya quedo preparado para GitHub Pages:
 
 - Vite detecta automaticamente el `base` cuando el build corre en GitHub Actions
-- se incluyo el workflow [deploy-pages.yml](../.github/workflows/deploy-pages.yml)
+- se incluyo el workflow [deploy-pages.yml](./.github/workflows/deploy-pages.yml)
 - funciona tanto para repos tipo `usuario.github.io` como para repos normales
 
 ### Pasos
