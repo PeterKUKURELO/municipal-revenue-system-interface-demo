@@ -15,6 +15,11 @@ import yapeLogo from '../../assets/yape.png';
 interface PaymentFlowProps {
   selectedObligations: Obligation[];
   onBack: () => void;
+  onPaymentSuccess: (payload: {
+    obligations: Obligation[];
+    method: PaymentMethod;
+    operationCode: string;
+  }) => void;
   onComplete: () => void;
 }
 
@@ -317,6 +322,7 @@ function resolveOperationCode(response: unknown, fallback: string) {
 export default function PaymentFlow({
   selectedObligations,
   onBack,
+  onPaymentSuccess,
   onComplete
 }: PaymentFlowProps) {
   const [step, setStep] = useState<PaymentStep>('summary');
@@ -326,8 +332,10 @@ export default function PaymentFlow({
   const [gatewayResponse, setGatewayResponse] = useState<unknown>(null);
   const [operationNumber, setOperationNumber] = useState('');
   const [gatewayReloadKey, setGatewayReloadKey] = useState(0);
+  const [confirmedAt, setConfirmedAt] = useState<Date | null>(null);
   const gatewayTargetRef = useRef<HTMLDivElement | null>(null);
   const gatewayInstanceRef = useRef<PaymeGatewayInstance | null>(null);
+  const paymentAppliedRef = useRef(false);
 
   const total = selectedObligations.reduce((sum, obligation) => {
     return sum + obligation.amount;
@@ -338,6 +346,8 @@ export default function PaymentFlow({
     setGatewayError(null);
     setGatewayStatus('idle');
     setGatewayResponse(null);
+    setConfirmedAt(null);
+    paymentAppliedRef.current = false;
     setStep('gateway');
   };
 
@@ -406,7 +416,24 @@ export default function PaymentFlow({
             return;
           }
 
+          const paidAt = new Date();
+          const resolvedOperationCode = resolveOperationCode(
+            response,
+            nextOperationNumber
+          );
+
+          if (!paymentAppliedRef.current) {
+            paymentAppliedRef.current = true;
+            onPaymentSuccess({
+              obligations: selectedObligations,
+              method: paymentMethod,
+              operationCode: resolvedOperationCode
+            });
+          }
+
+          setConfirmedAt(paidAt);
           setGatewayResponse(response);
+          setOperationNumber(resolvedOperationCode);
           setStep('confirmation');
         };
 
@@ -707,7 +734,7 @@ export default function PaymentFlow({
   }
 
   if (step === 'confirmation') {
-    const currentDate = new Date().toLocaleDateString('es-PE', {
+    const currentDate = (confirmedAt ?? new Date()).toLocaleDateString('es-PE', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

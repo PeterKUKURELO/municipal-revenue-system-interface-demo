@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Home, AlertCircle, FileText, Building2, Filter } from 'lucide-react';
 import type { Obligation, ObligationType } from '../types';
 
@@ -24,15 +24,37 @@ export default function ObligationsTable({
   const [selected, setSelected] = useState<string[]>([]);
   const [filter, setFilter] = useState<ObligationType | 'all'>('all');
 
+  useEffect(() => {
+    const payableIds = new Set(
+      obligations
+        .filter((obligation) => obligation.status !== 'Pagado')
+        .map((obligation) => obligation.id)
+    );
+
+    setSelected((currentSelected) =>
+      currentSelected.filter((id) => payableIds.has(id))
+    );
+  }, [obligations]);
+
   const filteredObligations = filter === 'all'
     ? obligations
     : obligations.filter(o => o.type === filter);
 
+  const selectableFilteredObligations = filteredObligations.filter(
+    (obligation) => obligation.status !== 'Pagado'
+  );
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelected(filteredObligations.map(o => o.id));
+      setSelected((currentSelected) => {
+        const nextIds = selectableFilteredObligations.map((obligation) => obligation.id);
+        return Array.from(new Set([...currentSelected, ...nextIds]));
+      });
     } else {
-      setSelected([]);
+      const filteredIds = new Set(filteredObligations.map((obligation) => obligation.id));
+      setSelected((currentSelected) =>
+        currentSelected.filter((id) => !filteredIds.has(id))
+      );
     }
   };
 
@@ -95,7 +117,12 @@ export default function ObligationsTable({
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selected.length === filteredObligations.length && filteredObligations.length > 0}
+                    checked={
+                      selectableFilteredObligations.length > 0 &&
+                      selectableFilteredObligations.every((obligation) =>
+                        selected.includes(obligation.id)
+                      )
+                    }
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="w-4 h-4"
                   />
@@ -119,6 +146,7 @@ export default function ObligationsTable({
                         type="checkbox"
                         checked={selected.includes(obligation.id)}
                         onChange={(e) => handleSelectOne(obligation.id, e.target.checked)}
+                        disabled={obligation.status === 'Pagado'}
                         className="w-4 h-4"
                       />
                     </td>

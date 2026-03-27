@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import ObligationsTable from './components/ObligationsTable';
@@ -6,24 +6,207 @@ import PaymentFlow from './components/PaymentFlow';
 import AdminPanel from './components/AdminPanel';
 import AccessPortal from './components/AccessPortal';
 import { LayoutDashboard, FileText } from 'lucide-react';
-import database from '../../db.json';
-import type { AdminRecord, AppData, CitizenRecord, Obligation } from './types';
+import type { AdminTransaction, AppData, Obligation } from './types';
+import { APP_STORAGE_KEY, cloneAppData, loadAppData, saveAppData } from './storage';
 
 type View = 'dashboard' | 'obligations' | 'payment' | 'admin';
 
 type Session =
-  | { role: 'user'; citizen: CitizenRecord }
-  | { role: 'admin'; admin: AdminRecord };
+  | { role: 'user'; citizenDni: string }
+  | { role: 'admin'; adminUsername: string };
 
-const appData = database as AppData;
+function calculateDebtSummary(obligations: Obligation[]) {
+  const pendingObligations = obligations.filter(
+    (obligation) => obligation.status !== 'Pagado'
+  );
+
+  return pendingObligations.reduce(
+    (summary, obligation) => {
+      summary.total += obligation.amount;
+
+      if (obligation.type === 'Arbitrios') {
+        summary.arbitrios += obligation.amount;
+      } else if (obligation.type === 'Multas') {
+        summary.multas += obligation.amount;
+      } else if (obligation.type === 'Otros') {
+        summary.otros += obligation.amount;
+      }
+
+      return summary;
+    },
+    { total: 0, arbitrios: 0, multas: 0, otros: 0 }
+  );
+}
+
+function formatPaymentDate(date: Date) {
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
+
+function formatPaymentDateTime(date: Date) {
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(date);
+}
+
+function updatePaymentsByType(appData: AppData, paidObligations: Obligation[]) {
+  const byType = new Map(
+    appData.adminDashboard.paymentsByType.map((item) => [item.type, { ...item }])
+  );
+
+  paidObligations.forEach((obligation) => {
+    const current = byType.get(obligation.type) ?? {
+      type: obligation.type,
+      count: 0,
+      total: 0,
+      percentage: 0
+    };
+
+    current.count += 1;
+    current.total += obligation.amount;
+    byType.set(obligation.type, current);
+  });
+
+  const updated = Array.from(byType.values());
+  const totalCount = updated.reduce((sum, item) => sum + item.count, 0);
+
+  return updated.map((item) => ({
+    ...item,
+    percentage: totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0
+  }));
+}
+
+function applyPaymentToAppData(
+  currentData: AppData,
+  citizenDni: string,
+  paidObligations: Obligation[],
+  operationCode: string,
+  paidAt: Date
+) {
+  const nextData = cloneAppData(currentData);
+  const citizen = nextData.citizens.find((item) => item.dni === citizenDni);
+
+  if (!citizen) {
+    return currentData;
+  }
+
+  const paidIds = new Set(paidObligations.map((obligation) => obligation.id));
+  citizen.obligations = citizen.obligations.map((obligation) => {
+    if (!paidIds.has(obligation.id)) {
+      return obligation;
+    }
+
+    return {
+      ...obligation,
+      status: 'Pagado'
+    };
+  });
+
+  const paymentDate = formatPaymentDate(paidAt);
+  const paymentDateTime = formatPaymentDateTime(paidAt);
+
+  const newRecentPayments = paidObligations.map((obligation) => ({
+    date: paymentDate,
+    concept: `${obligation.type} - ${obligation.description}`,
+    amount: obligation.amount,
+    status: 'Completado'
+  }));
+
+  citizen.recentPayments = [
+    ...newRecentPayments,
+    ...citizen.recentPayments
+  ].slice(0, 20);
+  citizen.debtSummary = calculateDebtSummary(citizen.obligations);
+
+  const newTransactions: AdminTransaction[] = paidObligations.map(
+    (obligation, index) => ({
+      id: `${operationCode}-${index + 1}`,
+      contribuyente: citizen.name,
+      tipo: obligation.type,
+      monto: obligation.amount,
+      fecha: paymentDateTime,
+      estado: 'Completado'
+    })
+  );
+
+  nextData.adminDashboard.recentTransactions = [
+    ...newTransactions,
+    ...nextData.adminDashboard.recentTransactions
+  ].slice(0, 20);
+
+  const totalPaid = paidObligations.reduce(
+    (sum, obligation) => sum + obligation.amount,
+    0
+  );
+
+  nextData.adminDashboard.metrics.totalRecaudado += totalPaid;
+  nextData.adminDashboard.metrics.transaccionesHoy += paidObligations.length;
+  nextData.adminDashboard.metrics.tasaConversion = Math.min(
+    99.9,
+    Number((nextData.adminDashboard.metrics.tasaConversion + 0.2).toFixed(1))
+  );
+  nextData.adminDashboard.paymentsByType = updatePaymentsByType(
+    nextData,
+    paidObligations
+  );
+
+  return nextData;
+}
 
 export default function App() {
+  const [appData, setAppData] = useState<AppData>(() => loadAppData());
   const [view, setView] = useState<View>('dashboard');
   const [selectedObligations, setSelectedObligations] = useState<Obligation[]>([]);
   const [session, setSession] = useState<Session | null>(null);
 
-  const isCitizen = session?.role === 'user';
-  const isAdmin = session?.role === 'admin';
+  const currentCitizen =
+    session?.role === 'user'
+      ? appData.citizens.find((item) => item.dni === session.citizenDni) ?? null
+      : null;
+  const currentAdmin =
+    session?.role === 'admin'
+      ? appData.admins.find((item) => item.username === session.adminUsername) ?? null
+      : null;
+
+  const isCitizen = currentCitizen !== null;
+  const isAdmin = currentAdmin !== null;
+
+  useEffect(() => {
+    saveAppData(appData);
+  }, [appData]);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== APP_STORAGE_KEY) {
+        return;
+      }
+
+      setAppData(loadAppData());
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  useEffect(() => {
+    if (session?.role === 'user' && !currentCitizen) {
+      setSession(null);
+      setView('dashboard');
+    }
+
+    if (session?.role === 'admin' && !currentAdmin) {
+      setSession(null);
+      setView('dashboard');
+    }
+  }, [currentAdmin, currentCitizen, session]);
 
   const handlePayNow = () => {
     setView('obligations');
@@ -43,6 +226,28 @@ export default function App() {
     setView('obligations');
   };
 
+  const handlePaymentSuccess = ({
+    obligations,
+    operationCode
+  }: {
+    obligations: Obligation[];
+    operationCode: string;
+  }) => {
+    if (!currentCitizen || obligations.length === 0) {
+      return;
+    }
+
+    setAppData((previousData) =>
+      applyPaymentToAppData(
+        previousData,
+        currentCitizen.dni,
+        obligations,
+        operationCode,
+        new Date()
+      )
+    );
+  };
+
   const handleCitizenLogin = ({
     dni,
     ubigeo
@@ -60,7 +265,7 @@ export default function App() {
 
     setSession({
       role: 'user',
-      citizen
+      citizenDni: citizen.dni
     });
     setView('dashboard');
     return null;
@@ -83,7 +288,7 @@ export default function App() {
 
     setSession({
       role: 'admin',
-      admin
+      adminUsername: admin.username
     });
     setView('admin');
     return null;
@@ -105,14 +310,22 @@ export default function App() {
     );
   }
 
+  if (session.role === 'user' && !currentCitizen) {
+    return null;
+  }
+
+  if (session.role === 'admin' && !currentAdmin) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
-        userName={isCitizen ? session.citizen.name : session.admin.displayName}
-        role={session.role}
+        userName={isCitizen ? currentCitizen.name : currentAdmin!.displayName}
+        role={isCitizen ? 'user' : 'admin'}
         userMeta={
           isCitizen
-            ? `DNI ${session.citizen.dni} • Ubigeo ${session.citizen.ubigeo}`
+            ? `DNI ${currentCitizen.dni} • Ubigeo ${currentCitizen.ubigeo}`
             : 'Acceso administrativo'
         }
         onLogout={handleLogout}
@@ -151,18 +364,18 @@ export default function App() {
 
       {isCitizen && view === 'dashboard' && (
         <Dashboard
-          userName={session.citizen.name}
-          dni={session.citizen.dni}
-          ubigeo={session.citizen.ubigeo}
-          debtSummary={session.citizen.debtSummary}
-          recentPayments={session.citizen.recentPayments}
+          userName={currentCitizen.name}
+          dni={currentCitizen.dni}
+          ubigeo={currentCitizen.ubigeo}
+          debtSummary={currentCitizen.debtSummary}
+          recentPayments={currentCitizen.recentPayments}
           onPayNow={handlePayNow}
         />
       )}
 
       {isCitizen && view === 'obligations' && (
         <ObligationsTable
-          obligations={session.citizen.obligations}
+          obligations={currentCitizen.obligations}
           onPaySelected={handlePaySelected}
         />
       )}
@@ -171,13 +384,14 @@ export default function App() {
         <PaymentFlow
           selectedObligations={selectedObligations}
           onBack={handleBackFromPayment}
+          onPaymentSuccess={handlePaymentSuccess}
           onComplete={handlePaymentComplete}
         />
       )}
 
       {isAdmin && view === 'admin' && (
         <AdminPanel
-          adminName={session.admin.displayName}
+          adminName={currentAdmin.displayName}
           metrics={appData.adminDashboard.metrics}
           recentTransactions={appData.adminDashboard.recentTransactions}
           paymentsByType={appData.adminDashboard.paymentsByType}
