@@ -106,18 +106,36 @@ Por ejemplo:
 - si un contribuyente realiza un pago, el historial ciudadano se actualiza
 - ese mismo movimiento puede verse luego en el panel administrativo
 
-## 11. Recomendaciones para la demostracion
+## 11. Interaccion con la pasarela Pay-Me
+
+Durante el proceso de pago, el portal se conecta con la pasarela Pay-Me para mostrar la experiencia de cobro dentro del mismo flujo del contribuyente.
+
+En esta demostracion, Pay-Me aporta lo siguiente:
+
+- Presenta una experiencia de pago integrada dentro del portal
+- Permite mostrar distintos metodos de pago en una sola vista
+- Da continuidad al proceso sin que el contribuyente sienta que sale del portal
+- Ayuda a representar una experiencia de pago mas ordenada, moderna y guiada
+
+Para la municipalidad, esto aporta valor porque:
+
+- mejora la experiencia de atencion digital al contribuyente
+- facilita la comprension del proceso de pago
+- permite mostrar una solucion de recaudo mas completa
+- refuerza la idea de trazabilidad entre el pago realizado y su reflejo en el panel administrativo
+
+## 12. Recomendaciones para la demostracion
 
 - Primero ingresa como contribuyente y realiza una prueba de pago
 - Luego ingresa como administrador para validar el cambio en el panel interno
 - Usa el icono de ayuda si deseas explicar visualmente la cartilla municipal
 - Cierra sesion al terminar cada prueba
 
-## 12. Cierre de sesión
+## 13. Cierre de sesión
 
 Tanto el contribuyente como el administrador pueden salir del sistema desde la opcion de cierre de sesion ubicada en la parte superior del portal.
 
-## 13. Uso sugerido en presentaciones
+## 14. Uso sugerido en presentaciones
 
 Si esta guia se usa para mostrar el portal a un equipo municipal, se recomienda el siguiente orden:
 
